@@ -1,4 +1,4 @@
-﻿var MAX_ITER = 500;
+var MAX_ITER = 500;
 
 //The following parameters are expected:
 // * id - unique message identificator
@@ -50,7 +50,8 @@ self.addEventListener('message', function(e) {
         }
     }
     
-    var array = new Uint8ClampedArray(pixels)
-	self.postMessage({id: id, pixels: array});
+    var array = new Uint8ClampedArray(pixels);
+    var buf = array.buffer;
+	self.postMessage({id: id, pixels: buf},[buf]);
     
 }, false);
