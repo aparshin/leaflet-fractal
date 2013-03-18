@@ -1,4 +1,4 @@
-﻿L.TileLayer.FractalLayer = L.TileLayer.Canvas.extend({
+L.TileLayer.FractalLayer = L.TileLayer.Canvas.extend({
 	options: {
 		async: true
 	},
@@ -13,7 +13,7 @@
 		this._worker.addEventListener('message', function(e) {
             var msg = _this._waitingMessage;
             //console.log('received', msg.id, _this._messages.length);
-            msg.callback(e.data.pixels, msg.date);
+            msg.callback(new Uint8ClampedArray(e.data.pixels), msg.date);
             _this._waitingMessage = null;
             _this._postNextMessage();
 		}, false);
