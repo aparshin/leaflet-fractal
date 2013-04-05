@@ -15,27 +15,20 @@
             margin: 0px;
         }
         
-        #description {
-            position: absolute;
-            top: 12px;
-            right: 13px;
-            width: 300px;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 5px;
-            padding: 0px 20px;
-            text-align: justify;
-        }
     </style>
-    
+    	<!--Fork Me on Github ribbon, we're using the awsome version from simonwhitaker available at https://github.com/simonwhitaker/github-fork-ribbon-css -->
+<link rel="stylesheet" href="gh-fork-ribbon.css" />
 </head>
 
-<body>
+<body>	<div class="github-fork-ribbon-wrapper right">
+<div class="github-fork-ribbon">
+<a href="https://github.com/calvinmetcalf/leaflet-leaflet-fractal">Fork me on GitHub</a>
+</div>
+</div>
 	<div id="map"></div>
-    <div id="description">
-        <p>This example demonstrates usage of <a href= "http://leafletjs.com">Leaflet</a> mapping library with HTML5 Web workers.</p>
-        <p>L.TileLayer.Canvas is used to show Mandelbrot set. All rendering is performed in web worker resulting in smooth user interaction.</p>
-    </div>
-
+<script src="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.js"></script>
+<script src="communist.js"></script>
+	<script src="FractalLayer.js"></script>
 	<script type="text/javascript">
         var map = L.map('map').setView([0, -90], 2);
         
