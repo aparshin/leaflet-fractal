@@ -33,7 +33,7 @@
 	<script type="text/javascript">
         var map = L.map('map',{minZoom:1}).setView([0, -90], 2);
         
-        L.tileLayer.fractalLayer().addTo(map);
+        L.tileLayer.fractalLayer(4).addTo(map);
         map.addHash();
 	</script>
 </body>

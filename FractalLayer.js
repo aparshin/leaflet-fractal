@@ -3,36 +3,38 @@ L.TileLayer.FractalLayer = L.TileLayer.Canvas.extend({
 		async: true,
 		maxZoom:23
 	},
-	initialize: function () {
+	initialize: function (workers) {
 		var workerFunc = function(data,cb) {
 			var scale = Math.pow(2, data.z - 1);
 			var x0 = data.x / scale - 1;
 			var y0 = data.y / scale - 1;
 			var d = 1/(scale<<8);
-			var pixels = [];
+			var pixels = new Array(262144);
 			var MAX_ITER=500;
-			var isOut,c,cx,cy,x,y,xn,yn;
+			var isOut,c,cx,cy,x,y,xn,yn,iii=0;
 			for (var py = 0; py < 256; py++) {
 				for (var px = 0; px < 256; px++) {
 					cx = x0 + px*d;
 					cy = y0 + py*d;
 					x = 0; y = 0;
+					isOut=0;
 					for (var iter = 0; iter < MAX_ITER; iter++) {
 						xn = x*x - y*y + cx;
 						yn = ((x*y)*2) + cy;
 						if (xn*xn + yn*yn > 4) {
+							isOut=0.75;
 							break;
 						}
 						x = xn;
 						y = yn;
 					}
 				c = (iter/MAX_ITER)*360;
-				(function(h){
+				(function(h,s){
 					//from http://schinckel.net/2012/01/10/hsv-to-rgb-in-javascript/
-					var s = 0.75, v = 0.75;
+					var v = 0.75;
 					var rgb, i, data = [];
 					if (s === 0) {
-						rgb = [v,v,v];
+						rgb = [0.75, 0.1875, 0.75];
 					} else {
 						h = h / 60;
 						i = Math.floor(h);
@@ -56,13 +58,13 @@ L.TileLayer.FractalLayer = L.TileLayer.Canvas.extend({
 							default:
 								rgb = [v, data[0], data[1]];
 								break;
-						}
-						pixels.push(rgb[0]*255);
-						pixels.push(rgb[1]*255);
-						pixels.push(rgb[2]*255);
-						pixels.push(255);
-					}
-				})(c)
+						}}
+						pixels[iii++]=(rgb[0]*255);
+						pixels[iii++]=(rgb[1]*255);
+						pixels[iii++]=(rgb[2]*255);
+						pixels[iii++]=(255);
+					
+				})(c,c===360?0:0.75)
 				}
 			}
 			var array = new Uint8ClampedArray(pixels);
@@ -70,13 +72,19 @@ L.TileLayer.FractalLayer = L.TileLayer.Canvas.extend({
 			cb({pixels: buf},[buf]);
 		}
 		var _this = this;
-		this._worker = communist(workerFunc)
+		this.workers=workers;
+		this._workers = new Array(workers);
+		var i = 0;
+		while(i<workers){
+		this._workers[i]=communist(workerFunc);
+		i++
+		}
 	},
 	drawTile: function (canvas, tilePoint) {
 		var _this = this,
 		z = this._map.getZoom();
 		canvas._tileIndex = {x: tilePoint.x, y: tilePoint.y, z: z};
-		this._worker.data({x: tilePoint.x, y:tilePoint.y, z: z}).then(function(data) {
+		this._workers[parseInt((Math.random()*this.workers),10)].data({x: tilePoint.x, y:tilePoint.y, z: z}).then(function(data) {
 			var array=new Uint8ClampedArray(data.pixels);
 			var ctx = canvas.getContext('2d');
 			var imagedata = ctx.getImageData(0, 0, 256, 256);
@@ -86,6 +94,6 @@ L.TileLayer.FractalLayer = L.TileLayer.Canvas.extend({
 		});
 	}
 });
-L.tileLayer.fractalLayer=function(){
-	return new L.TileLayer.FractalLayer();
+L.tileLayer.fractalLayer=function(workers){
+	return new L.TileLayer.FractalLayer(workers);
 }
