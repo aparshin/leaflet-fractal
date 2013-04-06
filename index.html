@@ -30,9 +30,9 @@
 <script src="communist.js"></script>
 	<script src="FractalLayer.js"></script>
 	<script type="text/javascript">
-        var map = L.map('map').setView([0, -90], 2);
+        var map = L.map('map',{minZoom:1}).setView([0, -90], 2);
         
-        (new L.TileLayer.FractalLayer()).addTo(map);
+        L.tileLayer.fractalLayer().addTo(map);
 	</script>
 </body>
 </html>
