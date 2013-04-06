@@ -28,7 +28,7 @@ L.TileLayer.FractalLayer = L.TileLayer.Canvas.extend({
 				c = (iter/MAX_ITER)*360;
 				(function(h){
 					//from http://schinckel.net/2012/01/10/hsv-to-rgb-in-javascript/
-					var s = 0.5, v = .5;
+					var s = 0.5, v = 0.75;
 					var rgb, i, data = [];
 					if (s === 0) {
 						rgb = [v,v,v];
