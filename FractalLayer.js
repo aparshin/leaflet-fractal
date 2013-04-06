@@ -9,7 +9,7 @@ L.TileLayer.FractalLayer = L.TileLayer.Canvas.extend({
 			var y0 = data.y / scale - 1;
 			var d = 1/(scale<<8);
 			var pixels = [];
-			var MAX_ITER=100;
+			var MAX_ITER=500;
 			var isOut,c,cx,cy,x,y,xn,yn;
 			for (var py = 0; py < 256; py++) {
 				for (var px = 0; px < 256; px++) {
