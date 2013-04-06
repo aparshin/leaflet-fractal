@@ -1,7 +1,7 @@
 L.TileLayer.FractalLayer = L.TileLayer.Canvas.extend({
 	options: {
 		async: true,
-		maxZoom:50
+		maxZoom:23
 	},
 	initialize: function () {
 		var workerFunc = function(data,cb) {
