@@ -27,14 +27,20 @@
 </div>
 	<div id="map"></div>
 <script src="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.js"></script>
-<script src="communist.js"></script>
 	<script src="FractalLayer.js"></script>
 	<script src="leaflet-hash.js"></script>
 	<script type="text/javascript">
         var map = L.map('map',{minZoom:1}).setView([0, -90], 2);
         
-        L.tileLayer.fractalLayer(4).addTo(map);
-        map.addHash();
+        var lc=L.control.layers({
+            "mandlebrot":L.tileLayer.fractalLayer(6).addTo(map),
+            "multibrot3":L.tileLayer.fractalLayer(6,"multibrot3"),
+            "multibrot5":L.tileLayer.fractalLayer(6,"multibrot5"),
+            "burning ship":L.tileLayer.fractalLayer(6,"burningShip"),
+            "tricorn":L.tileLayer.fractalLayer(6,"tricorn")
+        },{},{position:"topleft",collapsed:false}).addTo(map);
+         map.setView([0, -90], 2).addHash({lc:lc});
+      
 	</script>
 </body>
 </html>

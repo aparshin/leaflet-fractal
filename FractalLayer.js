@@ -1,99 +1,64 @@
 L.TileLayer.FractalLayer = L.TileLayer.Canvas.extend({
 	options: {
 		async: true,
-		maxZoom:23
+		maxZoom:23,
+        continuousWorld:true
 	},
-	initialize: function (workers) {
-		var workerFunc = function(data,cb) {
-			var scale = Math.pow(2, data.z - 1);
-			var x0 = data.x / scale - 1;
-			var y0 = data.y / scale - 1;
-			var d = 1/(scale<<8);
-			var pixels = new Array(262144);
-			var MAX_ITER=500;
-			var isOut,c,cx,cy,x,y,xn,yn,iii=0;
-			for (var py = 0; py < 256; py++) {
-				for (var px = 0; px < 256; px++) {
-					cx = x0 + px*d;
-					cy = y0 + py*d;
-					x = 0; y = 0;
-					isOut=0;
-					for (var iter = 0; iter < MAX_ITER; iter++) {
-						xn = x*x - y*y + cx;
-						yn = ((x*y)*2) + cy;
-						if (xn*xn + yn*yn > 4) {
-							isOut=0.75;
-							break;
-						}
-						x = xn;
-						y = yn;
-					}
-				c = (iter/MAX_ITER)*360;
-				(function(h,s){
-					//from http://schinckel.net/2012/01/10/hsv-to-rgb-in-javascript/
-					var v = 0.75;
-					var rgb, i, data = [];
-					if (s === 0) {
-						rgb = [0.75, 0.1875, 0.75];
-					} else {
-						h = h / 60;
-						i = Math.floor(h);
-						data = [v*(1-s), v*(1-s*(h-i)), v*(1-s*(1-(h-i)))];
-						switch(i) {
-							case 0:
-								rgb = [v, data[2], data[0]];
-								break;
-							case 1:
-								rgb = [data[1], v, data[0]];
-								break;
-							case 2:
-								rgb = [data[0], v, data[2]];
-								break;
-							case 3:
-								rgb = [data[0], data[1], v];
-								break;
-							case 4:
-								rgb = [data[2], data[0], v];
-								break;
-							default:
-								rgb = [v, data[0], data[1]];
-								break;
-						}}
-						pixels[iii++]=(rgb[0]*255);
-						pixels[iii++]=(rgb[1]*255);
-						pixels[iii++]=(rgb[2]*255);
-						pixels[iii++]=(255);
-					
-				})(c,c===360?0:0.75)
-				}
-			}
-			var array = new Uint8ClampedArray(pixels);
- 			var buf = array.buffer;
-			cb({pixels: buf},[buf]);
-		}
-		var _this = this;
+	initialize: function (workers,fractalType) {
+        this.fractalType = fractalType||"mandlebrot";
 		this.workers=workers;
-		this._workers = new Array(workers);
-		var i = 0;
-		while(i<workers){
-		this._workers[i]=communist(workerFunc);
-		i++
-		}
+		this._workers = new Array(this.workers);
+        this.messages={};
+        
 	},
-	drawTile: function (canvas, tilePoint) {
-		var _this = this,
-		z = this._map.getZoom();
-		canvas._tileIndex = {x: tilePoint.x, y: tilePoint.y, z: z};
-		this._workers[parseInt((Math.random()*this.workers),10)].data({x: tilePoint.x, y:tilePoint.y, z: z}).then(function(data) {
-			var array=new Uint8ClampedArray(data.pixels);
+    onAdd:function(map){
+        var _this=this;
+    	var i = 0;
+		while(i<this.workers){
+		    this._workers[i]=new Worker("workers/"+this.fractalType+".js");
+            this._workers[i].onmessage=function(e) {
+        var canvas;
+        if(e.data.id in _this.messages){
+            canvas = _this.messages[e.data.id];
+        }else{
+            return;
+        }
+        	var array=new Uint8ClampedArray(e.data.pixels);
 			var ctx = canvas.getContext('2d');
 			var imagedata = ctx.getImageData(0, 0, 256, 256);
 			imagedata.data.set(array);
 			ctx.putImageData(imagedata, 0, 0);
 			_this.tileDrawn(canvas);
-		});
+		};
+		    i++;
+		}
+        this.on("tileunload", function(e) {
+            var pos = e.tile._tileIndex,
+                id = [pos.x, pos.y, pos.z].join(':');
+                if(id in _this.messages){
+                    delete _this.messages[id];
+                }
+        });
+       return L.TileLayer.Canvas.prototype.onAdd.call(this,map);
+    },
+    onRemove:function(map){
+        this.messages={};
+        var len = this._workers.length;
+    var i =0;
+	while(i<len){
+	this._workers[i].terminate();
+	i++;
+	}
+	return L.TileLayer.Canvas.prototype.onRemove.call(this,map);
+    },
+	drawTile: function (canvas, tilePoint) {
+		var z = this._map.getZoom();
+		canvas._tileIndex = {x: tilePoint.x, y: tilePoint.y, z: z};
+        var tileID=tilePoint.x+":"+tilePoint.y+":"+z;
+        this.messages[tileID]=canvas;
+		this._workers[parseInt((Math.random()*this.workers),10)].postMessage({x: tilePoint.x, y:tilePoint.y, z: z,id:tileID});
 	}
 });
-L.tileLayer.fractalLayer=function(workers){
-	return new L.TileLayer.FractalLayer(workers);
+L.tileLayer.fractalLayer=function(workers,t){
+	return new L.TileLayer.FractalLayer(workers,t);
 }
