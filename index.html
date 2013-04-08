@@ -34,10 +34,13 @@
         
         var lc=L.control.layers({
             "mandlebrot":L.tileLayer.fractalLayer(6).addTo(map),
-            "multibrot3":L.tileLayer.fractalLayer(6,"multibrot3"),
-            "multibrot5":L.tileLayer.fractalLayer(6,"multibrot5"),
+            "multibrot3":L.tileLayer.fractalLayer(6,"multibrot3",300),
+            "multibrot5":L.tileLayer.fractalLayer(6,"multibrot5",200),
             "burning ship":L.tileLayer.fractalLayer(6,"burningShip"),
-            "tricorn":L.tileLayer.fractalLayer(6,"tricorn")
+            "tricorn":L.tileLayer.fractalLayer(6,"tricorn"),
+            "julia -0.74543+0.11301*i":L.tileLayer.fractalLayer(6,"julia"),
+            "julia -0.75+0.11*i":L.tileLayer.fractalLayer(6,"julia",500,-0.75,0.11),
+            "julia -0.1+0.651*i":L.tileLayer.fractalLayer(6,"julia",500,-0.1,0.651)
         },{},{position:"topleft",collapsed:false}).addTo(map);
          map.setView([0, -90], 2).addHash({lc:lc});
       
