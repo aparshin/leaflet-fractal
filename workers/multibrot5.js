@@ -62,8 +62,8 @@ var workerFunc = function(data,cb) {
 				}
 			}
 			var array = new Uint8ClampedArray(pixels);
- 			var buf = array.buffer;
-			cb({pixels: buf,id:data.id},[buf]);
+ 		    data.pixels = array.buffer;
+    		cb(data,[data.pixels]);
 		}
 function callBack(a,b){
     self.postMessage(a,b);
