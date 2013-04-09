@@ -1,3 +1,4 @@
+importScripts("../colors.js");
 var workerFunc = function(data,cb) {
     		var scale = Math.pow(2, data.z - 1);
 			var x0 = data.x / scale - 1;
@@ -22,43 +23,11 @@ var workerFunc = function(data,cb) {
 						x = xn;
 						y = yn;
 					}
-				c = (iter/MAX_ITER)*360;
-				(function(h,s){
-					//from http://schinckel.net/2012/01/10/hsv-to-rgb-in-javascript/
-					var v = 0.75;
-					var rgb, i, data = [];
-					if (s === 0) {
-						rgb = [0.75, 0.1875, 0.75];
-					} else {
-						h = h / 60;
-						i = Math.floor(h);
-						data = [v*(1-s), v*(1-s*(h-i)), v*(1-s*(1-(h-i)))];
-						switch(i) {
-							case 0:
-								rgb = [v, data[2], data[0]];
-								break;
-							case 1:
-								rgb = [data[1], v, data[0]];
-								break;
-							case 2:
-								rgb = [data[0], v, data[2]];
-								break;
-							case 3:
-								rgb = [data[0], data[1], v];
-								break;
-							case 4:
-								rgb = [data[2], data[0], v];
-								break;
-							default:
-								rgb = [v, data[0], data[1]];
-								break;
-						}}
-						pixels[iii++]=(rgb[0]*255);
-						pixels[iii++]=(rgb[1]*255);
-						pixels[iii++]=(rgb[2]*255);
-						pixels[iii++]=(255);
-					
-				})(c,c===360?0:0.75)
+				    c = Math.floor((iter/MAX_ITER)*360);
+                    pixels[iii++]=colors[c][0];
+					pixels[iii++]=colors[c][1];
+						pixels[iii++]=colors[c][2];
+						pixels[iii++]=255;
 				}
 			}
 			var array = new Uint8ClampedArray(pixels);
