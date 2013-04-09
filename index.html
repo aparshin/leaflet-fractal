@@ -5,6 +5,7 @@
 
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.css" />
     <script src="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.js"></script>
+    <script src="leaflet-hash.js"></script>
 
 	<script src="FractalLayer.js"></script>
     
@@ -17,34 +18,36 @@
         
     </style>
     	<!--Fork Me on Github ribbon, we're using the awsome version from simonwhitaker available at https://github.com/simonwhitaker/github-fork-ribbon-css -->
-<link rel="stylesheet" href="gh-fork-ribbon.css" />
+        <link rel="stylesheet" href="gh-fork-ribbon.css" />
 </head>
 
-<body>	<div class="github-fork-ribbon-wrapper right">
-<div class="github-fork-ribbon">
-<a href="https://github.com/aparshin/leaflet-fractal">Fork me on GitHub</a>
-</div>
-</div>
+<body>
+    <div class="github-fork-ribbon-wrapper right">
+        <div class="github-fork-ribbon">
+            <a href="https://github.com/aparshin/leaflet-fractal">Fork me on GitHub</a>
+        </div>
+    </div>
+    
 	<div id="map"></div>
-<script src="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.js"></script>
-	<script src="FractalLayer.js"></script>
-	<script src="leaflet-hash.js"></script>
+    
 	<script type="text/javascript">
-        var map = L.map('map',{minZoom:1});
+        var map = L.map('map', {minZoom:1});
+        
+        var numWorkers = 3;
         
         var lc=L.control.layers({
-            "mandlebrot":L.tileLayer.fractalLayer(6).addTo(map),
-            "multibrot3":L.tileLayer.fractalLayer(6,"multibrot3",300),
+            "mandlebrot":L.tileLayer.fractalLayer(numWorkers).addTo(map),
+            "multibrot3":L.tileLayer.fractalLayer(numWorkers,"multibrot3",300),
             <!--Dosn't work at the moment"multibrot5":L.tileLayer.fractalLayer(6,"multibrot5",200),-->
-            "burning ship":L.tileLayer.fractalLayer(6,"burningShip"),
-            "tricorn":L.tileLayer.fractalLayer(6,"tricorn"),
-            "julia -0.74543+0.11301*i":L.tileLayer.fractalLayer(6,"julia"),
-            "julia -0.75+0.11*i":L.tileLayer.fractalLayer(6,"julia",500,-0.75,0.11),
-            "julia -0.1+0.651*i":L.tileLayer.fractalLayer(6,"julia",500,-0.1,0.651),
-            "julia -0.4+0.6*i":L.tileLayer.fractalLayer(6,"julia",500,-0.4,0.6),
-            "julia -0.8+0.156*i":L.tileLayer.fractalLayer(6,"julia",500,-0.8,0.156),
-             "julia -1.118484848+0.273636364*i":L.tileLayer.fractalLayer(6,"julia",300,-1.118484848,0.273636364),
-             "julia  -0.37+0.6*i":L.tileLayer.fractalLayer(6,"julia",500,-0.37,0.6)
+            "burning ship":L.tileLayer.fractalLayer(numWorkers,"burningShip"),
+            "tricorn":L.tileLayer.fractalLayer(numWorkers,"tricorn"),
+            "julia -0.74543+0.11301*i":L.tileLayer.fractalLayer(numWorkers,"julia"),
+            "julia -0.75+0.11*i":L.tileLayer.fractalLayer(numWorkers,"julia",500,-0.75,0.11),
+            "julia -0.1+0.651*i":L.tileLayer.fractalLayer(numWorkers,"julia",500,-0.1,0.651),
+            "julia -0.4+0.6*i":L.tileLayer.fractalLayer(numWorkers,"julia",500,-0.4,0.6),
+            "julia -0.8+0.156*i":L.tileLayer.fractalLayer(numWorkers,"julia",500,-0.8,0.156),
+             "julia -1.118484848+0.273636364*i":L.tileLayer.fractalLayer(numWorkers,"julia",300,-1.118484848,0.273636364),
+             "julia  -0.37+0.6*i":L.tileLayer.fractalLayer(numWorkers,"julia",500,-0.37,0.6)
         },{},{position:"topleft",collapsed:false}).addTo(map);
          map.setView([0, -90], 2).addHash({lc:lc});
       
