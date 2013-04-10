@@ -95,17 +95,15 @@ var workerFunc = function(data,cb) {
     var d = 1/(scale<<8);
     var pixels = new Array(65536);
     var MAX_ITER=data.maxIter;
-    var c,cx,cy,iter,iii=0;
-    for (var py = 0; py < 256; py++) {
-        for (var px = 0; px < 256; px++) {
-            cx = x0 + px*d;
-            cy = y0 + py*d;
-            
-            iter = fractalFunctions[data.type](cx, cy, MAX_ITER, data.cr, data.ci);
-            
-            c = Math.floor((iter/MAX_ITER)*360);
-            pixels[iii++] = colors[c];
-        }
+    var c,cx,cy,iter,i=0,px,py;
+    while (i < 65536) {
+        px = i%256;
+        py = (i-px)>>8;
+        cx = x0 + px*d;
+        cy = y0 + py*d;    
+        iter = fractalFunctions[data.type](cx, cy, MAX_ITER, data.cr, data.ci);
+        c = Math.floor((iter/MAX_ITER)*360);
+        pixels[i++] = colors[c];
     }
     var array = new Uint32Array(pixels);
     data.pixels = array.buffer;
