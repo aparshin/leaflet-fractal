@@ -93,7 +93,7 @@ var workerFunc = function(data,cb) {
     var x0 = data.x / scale - 1;
     var y0 = data.y / scale - 1;
     var d = 1/(scale<<8);
-    var pixels = new Array(262144);
+    var pixels = new Array(65536);
     var MAX_ITER=data.maxIter;
     var c,cx,cy,iter,iii=0;
     for (var py = 0; py < 256; py++) {
@@ -104,13 +104,10 @@ var workerFunc = function(data,cb) {
             iter = fractalFunctions[data.type](cx, cy, MAX_ITER, data.cr, data.ci);
             
             c = Math.floor((iter/MAX_ITER)*360);
-            pixels[iii++] = colors[c][0];
-            pixels[iii++] = colors[c][1];
-            pixels[iii++] = colors[c][2];
-            pixels[iii++] = 255;
+            pixels[iii++] = colors[c];
         }
     }
-    var array = new Uint8ClampedArray(pixels);
+    var array = new Uint32Array(pixels);
     data.pixels = array.buffer;
     cb(data,[data.pixels]);
 }
