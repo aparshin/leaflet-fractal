@@ -40,7 +40,7 @@ L.TileLayer.FractalLayer = L.TileLayer.Canvas.extend({
                     return;
                 }
                 
-                var array=new Uint8ClampedArray(e.data.pixels);
+                var array=new Uint8Array(e.data.pixels);
                 var ctx = canvas.getContext('2d');
                 var imagedata = ctx.getImageData(0, 0, 256, 256);
                 imagedata.data.set(array);
