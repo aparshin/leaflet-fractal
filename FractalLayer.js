@@ -24,7 +24,7 @@ L.TileLayer.FractalLayer = L.TileLayer.Canvas.extend({
         this.queue.tiles = [];
     	while(i<this.numWorkers){
             this.queue.free.push(i);
-		    this._workers[i]=new Worker("workers/"+this.fractalType+".js");
+		    this._workers[i]=new Worker("FractalWorker.js");
             this._workers[i].onmessage=function(e) {
                 var canvas;
                 if(_this.queue.len) {
@@ -97,7 +97,8 @@ L.TileLayer.FractalLayer = L.TileLayer.Canvas.extend({
             workerID: workerID,
             cr: this.cr,
             ci: this.ci,
-            maxIter: this.maxIter
+            maxIter: this.maxIter,
+            type: this.fractalType
         });
     }
 });
