@@ -1,4 +1,4 @@
-importScripts("colors.js");
+var palette = null;
 
 //functions return number from 0 to (maxIter-1)
 var fractalFunctions = {
@@ -88,26 +88,38 @@ var fractalFunctions = {
     }
 }
 
-var workerFunc = function(data,cb) {
-    var scale = Math.pow(2, data.z - 1);
-    var x0 = data.x / scale - 1;
-    var y0 = data.y / scale - 1;
-    var d = 1/(scale<<8);
-    var pixels = new Array(65536);
-    var MAX_ITER=data.maxIter;
-    var c,cx,cy,iter,i=0,px,py;
-    while (i < 65536) {
-        px = i%256;
-        py = (i-px)>>8;
-        cx = x0 + px*d;
-        cy = y0 + py*d;    
-        iter = fractalFunctions[data.type](cx, cy, MAX_ITER, data.cr, data.ci);
-        c = Math.floor((iter/MAX_ITER)*360);
-        pixels[i++] = colors[c];
+var commands = {
+    palette: function(data, cb) {
+        palette = new Uint32Array(data.palette);
+    },
+    render: function(data,cb) {
+        if (!palette) {
+            cb();
+            return;
+        };
+        
+        var scale = Math.pow(2, data.z - 1);
+        var x0 = data.x / scale - 1;
+        var y0 = data.y / scale - 1;
+        var d = 1/(scale<<8);
+        var pixels = new Array(65536);
+        var MAX_ITER=data.maxIter;
+        var c,cx,cy,iter,i=0,px,py;
+        
+        var debugIter = [];
+        
+        while (i < 65536) {
+            px = i%256;
+            py = (i-px)>>8;
+            cx = x0 + px*d;
+            cy = y0 + py*d;    
+            iter = fractalFunctions[data.type](cx, cy, MAX_ITER, data.cr, data.ci);
+            pixels[i++] = palette[iter];
+        }
+        var array = new Uint32Array(pixels);
+        data.pixels = array.buffer;
+        cb(data,[data.pixels]);
     }
-    var array = new Uint32Array(pixels);
-    data.pixels = array.buffer;
-    cb(data,[data.pixels]);
 }
 
 function callBack(a,b){
@@ -115,5 +127,9 @@ function callBack(a,b){
 }
 
 self.onmessage=function(e){
-    workerFunc(e.data,callBack);
+    var commandName = e.data.command;
+    
+    if (commandName in commands) {
+        commands[commandName](e.data, callBack);
+    }
 };
